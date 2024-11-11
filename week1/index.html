@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <title>Dog Wiki Page</title>
+</head>
+<body>
+
+    <div class="container" id="wiki-container"></div>
+
+
+
+
+    
+    <script>
+
+        const breeds = ['bulldog', 'labrador', 'poodle', 'beagle', 'terrier'];
+
+
+        async function fetchDogImage(breed){
+            const response = await fetch(`https://dog.ceo/api/breed/${breed}/images/random`)
+            const data = await response.json()
+            return data.message
+        }
+
+        async function fetchSummary(breed){
+            const response = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${breed}`)
+            const data = await response.json()
+            return data.extract
+
+        }
+
+        async function createItem(breed){
+
+            imgSrc = await fetchDogImage(breed)
+            summary = await fetchSummary(breed)
+            
+            const wikiItem = document.createElement("div")
+            wikiItem.className = 'wiki-item'
+
+            const wikiHeader = document.createElement("h1")
+            wikiHeader.textContent = breed.charAt(0).toUpperCase() + breed.slice(1);
+            wikiHeader.className = "wiki-header"
+
+            const wikiContent = document.createElement("div")
+            wikiContent.className = 'wiki-content'
+
+            const wikiText = document.createElement('p');
+            wikiText.className = 'wiki-text';
+            wikiText.textContent = summary
+
+
+            const imgContainer = document.createElement('div')
+            imgContainer.className = 'img-container'
+            
+            const img = document.createElement("img")
+            img.className = 'wiki-img'
+            img.src = imgSrc
+
+            imgContainer.appendChild(img)
+            wikiContent.appendChild(wikiText)
+            wikiContent.appendChild(imgContainer)
+            wikiItem.appendChild(wikiHeader);
+            wikiItem.appendChild(wikiContent);
+
+            return wikiItem
+            
+        }
+
+        async function generateItem(){
+            const container = document.getElementById('wiki-container');
+            for(const breed of breeds){
+                const finalItem = await createItem(breed)
+                container.appendChild(finalItem)
+            }
+        }
+        window.onload = generateItem()
+    </script>
+</body>
+</html>
